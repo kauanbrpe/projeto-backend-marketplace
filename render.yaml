@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: marketplace-flask
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn run:app
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: banco-marketplace
+          property: connectionString
+
+databases:
+  - name: banco-marketplace
+    plan: free
