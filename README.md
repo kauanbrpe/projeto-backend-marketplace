@@ -18,8 +18,8 @@ Na cadeira de Back-end do Centro Universitário Tiradentes de Pernambuco foi pro
 
 - Python - Linguagem de programação robusta e base do projeto.
 - Flask - Micro framework web projetado para ser leve, minimalista e flexível.
-- SQLAlchemy - uma biblioteca e um Mapeador Objeto-Relacional (ORM).
 - Flask-RESTX - é um conjunto de ferramentas open source para modelar, documentar, consumir e testar APIs RESTful.
+- SQLAlchemy - uma biblioteca e um Mapeador Objeto-Relacional (ORM).
 - PostgreSQL - Banco de dados relacional robusto utilizado em ambiente de produção (hospedado no Render).
 - SQLite - é uma biblioteca de banco de dados relacional (SGBD) embutida, autocontida e sem servidor (serverless).
 - Gunicorn - Servidor WSGI de alta performance para rodar a aplicação em ambiente de produção.
