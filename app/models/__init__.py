@@ -6,3 +6,8 @@ from app.models.order_model import OrderModel
 from app.models.payment_model import PaymentModel
 from app.models.coupon_model import CouponModel
 from app.models.review_model import ReviewModel
+from app.models.category_model import CategoryModel
+
+
+
+
