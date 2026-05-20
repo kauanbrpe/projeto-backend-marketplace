@@ -7,3 +7,10 @@ class CategoryModel(db.Model):
     name = db.Column(db.String(50), nullable=False, unique=True)
     
     products = db.relationship('ProductModel', backref='category', lazy=True)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "products": self.products
+        }
