@@ -13,6 +13,7 @@ Na cadeira de Back-end do Centro Universitário Tiradentes de Pernambuco foi pro
 - Breno Nascimento Lima
 - Fábio Pereira da Sousa
 - Lucas Antônio da Silva
+- Isabela Inês Maria de Melo
 
 ## 🌐 Tecnologias utilizadas
 
