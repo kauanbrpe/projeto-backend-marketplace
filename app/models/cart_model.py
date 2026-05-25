@@ -14,4 +14,15 @@ class CartModel(db.Model):
     products = db.relationship('ProductModel', secondary=cart_items, lazy='subquery')
 
     def to_dict(self):
-        return {"id": self.id, "user_id": self.user_id, "products": [product.to_dict() for product in self.products]}
+        detailed_products = []
+        for p in self.products:
+            qtd = db.session.query(cart_items.c.quantity).filter(cart_id=self.id, product_id=p.id).scalar()
+
+            detailed_products.append({
+                "product_id": p.id,
+                "name": p.name,
+                "price": p.price,
+                "quantity": qtd if qtd else 1
+            })
+
+        return {"id": self.id, "user_id": self.user_id, "products": detailed_products}

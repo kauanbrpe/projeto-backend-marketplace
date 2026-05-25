@@ -18,6 +18,7 @@ class OrderModel(db.Model):
     total_price = db.Column(db.Numeric(precision=10, scale=2), nullable=False, default=0.00)
     created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
     items = db.relationship('OrderItemModel', backref='order', lazy=True, cascade="all, delete-orphan")
+    coupon_id = db.Column(db.Integer, db.ForeignKey('coupons.id', ondelete='CASCADE'))
 
     def to_dict(self):
         return {
@@ -32,5 +33,6 @@ class OrderModel(db.Model):
                     "quantity": item.quantity,
                     "price_at_purchase": float(item.historic_price)
                 } for item in self.items
-            ]
+            ],
+            "coupon_id": self.coupon_id
         }
