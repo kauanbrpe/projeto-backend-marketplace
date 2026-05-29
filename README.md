@@ -84,8 +84,8 @@ marketplace-api/
 
 ```bash
 # 1. Clone o repositório
-git clone https://github.com/seu-usuario/marketplace-api.git
-cd marketplace-api
+git clone https://github.com/kauanbrpe/projeto-backend-marketplace.git
+cd projeto-backend-marketplace
 
 # 2. Crie e ative o ambiente virtual
 python -m venv venv
@@ -95,11 +95,7 @@ venv\Scripts\activate          # Windows
 # 3. Instale as dependências
 pip install -r requirements.txt
 
-# 4. Configure as variáveis de ambiente
-cp .env.example .env
-# Edite o arquivo .env com suas credenciais
-
-# 5. Execute a aplicação
+# 4. Execute a aplicação
 python run.py
 ```
 
