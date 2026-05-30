@@ -4,3 +4,7 @@ from app.repository.category_repository import CategoryRepository
 from app.repository.product_repository import ProductRepository
 from app.repository.user_repository import UserRepository
 from app.repository.cart_repository import CartRepository
+from app.repository.coupon_repository import CouponRepository
+from app.repository.payment_repository import PaymentRepository
+from app.repository.item_perdido_repository import ItemPerdidoRepository
+from app.repository.order_repository import OrderRepository
