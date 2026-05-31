@@ -1,6 +1,7 @@
 from app import db
 from app.models.payment_model import PaymentModel
 from app.models.order_model import OrderModel
+import uuid
 
 class PaymentService:
     @staticmethod
@@ -10,6 +11,7 @@ class PaymentService:
     @staticmethod
     def processar_pagamento(order_id, metodo_pagamento, valor):
         pedido = OrderModel.query.get(order_id)
+        
         
         if not pedido:
             return None  
@@ -22,8 +24,9 @@ class PaymentService:
         novo_pagamento = PaymentModel(
             order_id=order_id,
             payment_method=metodo_pagamento,
-            amount=valor,
-            status="Aprovado"
+            amount_paid=valor,  
+            gateway_transaction_id=str(uuid.uuid4()), 
+            status="Aprovado"  
         )
         db.session.add(novo_pagamento)
         

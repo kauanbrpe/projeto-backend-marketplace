@@ -7,7 +7,7 @@ class ReviewService:
         return ReviewModel.query.filter_by(product_id=product_id).all()
 
     @staticmethod
-    def criar_avaliacao(user_id, product_id, nota, comentario):
+    def criar_avaliacao(user_id, product_id, nota, titulo, comentario):
         
         if nota < 1:
             return False
@@ -18,6 +18,7 @@ class ReviewService:
             user_id=user_id,
             product_id=product_id,
             rating=int(nota),
+            title=titulo,       
             comment=comentario
         )
         db.session.add(nova_review)

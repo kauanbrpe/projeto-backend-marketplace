@@ -15,17 +15,20 @@ def listar_por_produto(product_id):
 def cadastrar_review():
     data = request.get_json()
     
-    if not data or 'user_id' not in data or 'product_id' not in data or 'rating' not in data:
+    
+    if not data or 'user_id' not in data or 'product_id' not in data or 'rating' not in data or 'title' not in data:
         return jsonify({"erro": "Dados obrigatorios ausentes"}), 400
         
     comentario = ""
     if 'comment' in data:
         comentario = data['comment']
         
+    
     nova = ReviewService.criar_avaliacao(
         data['user_id'], 
         data['product_id'], 
         data['rating'], 
+        data['title'],
         comentario
     )
     

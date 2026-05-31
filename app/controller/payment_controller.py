@@ -12,18 +12,21 @@ def processar_pagamento():
         
     metodo = data['metodo_pagamento']
     
-    
     if metodo != 'Cartão de Crédito':
         if metodo != 'Pix':
             if metodo != 'Boleto Bancário':
                 return jsonify({"erro": "Metodo de pagamento invalido"}), 400
                 
-   
     if metodo == 'Cartão de Crédito':
         if 'numero_cartao' not in data or 'nome_titular' not in data or 'validade' not in data or 'cvv' not in data:
             return jsonify({"erro": "Dados do cartao de credito incompletos"}), 400
             
-    pagamento = PaymentService.processar(data)
+    
+    pagamento = PaymentService.processar_pagamento(
+        data['order_id'],
+        data['metodo_pagamento'],
+        data.get('valor') 
+    )
     
     if pagamento is None:
         return jsonify({"erro": "Pedido nao encontrado ou pagamento recusado"}), 404
