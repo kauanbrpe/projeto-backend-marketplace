@@ -8,7 +8,7 @@ class ReviewService:
 
     @staticmethod
     def criar_avaliacao(user_id, product_id, nota, comentario):
-        # Validação da regra de negócio: Nota deve ser inteiro entre 1 e 5
+        
         if nota < 1:
             return False
         if nota > 5:
