@@ -9,6 +9,11 @@ from app.controller.item_perdido_controller import item_perdido_bp
 from app.controller.payment_controller import payment_bp
 from app.controller.perdido_controller import perdido_bp
 from app.controller.review_controller import review_bp
+from app.controller.cart_controller import cart_bp
+from app.controller.category_controller import category_bp
+from app.controller.complaint_controller import complaint_bp
+from app.controller.product_controller import product_bp
+from app.controller.user_controller import user_bp
 from app.repository import UserRepository
 
 db = SQLAlchemy()
@@ -31,6 +36,11 @@ def create_app():
     app.register_blueprint(payment_bp)
     app.register_blueprint(perdido_bp)
     app.register_blueprint(review_bp)
+    app.register_blueprint(user_bp)
+    app.register_blueprint(cart_bp)
+    app.register_blueprint(product_bp)
+    app.register_blueprint(category_bp)
+    app.register_blueprint(complaint_bp)
 
     @login_manager.user_loader
     def load_user(user_id):

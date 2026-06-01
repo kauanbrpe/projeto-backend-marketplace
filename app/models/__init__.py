@@ -9,6 +9,7 @@ from app.models.review_model import ReviewModel
 from app.models.category_model import CategoryModel
 from app.models.perdido_model import PerdidoModel
 from app.models.item_perdido_model import ItemPerdidoModel
+from app.models.complaint_model import ComplaintModel
 
 
 
