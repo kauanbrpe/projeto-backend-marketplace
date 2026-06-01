@@ -15,6 +15,7 @@ class ComplaintModel(db.Model):
         return {
             "id": self.id,
             "order_id": self.order_id,
+            "user_id": self.user_id,
             "description": self.description,
             "status": self.status,
             "created_at": self.created_at.isoformat()
