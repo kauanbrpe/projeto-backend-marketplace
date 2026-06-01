@@ -7,8 +7,8 @@ class ReviewService:
         return ReviewModel.query.filter_by(product_id=product_id).all()
 
     @staticmethod
-    def criar_avaliacao(user_id, product_id, nota, comentario):
-        # Validação da regra de negócio: Nota deve ser inteiro entre 1 e 5
+    def criar_avaliacao(user_id, product_id, nota, titulo, comentario):
+        
         if nota < 1:
             return False
         if nota > 5:
@@ -18,6 +18,7 @@ class ReviewService:
             user_id=user_id,
             product_id=product_id,
             rating=int(nota),
+            title=titulo,       
             comment=comentario
         )
         db.session.add(nova_review)
