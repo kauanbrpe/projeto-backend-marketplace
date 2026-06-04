@@ -1,22 +1,32 @@
-from flask import Blueprint, jsonify, request
-from app.service.category_service import CategoryService
+from flask import request
+from flask_restx import Namespace, Resource, fields
+from flask_login import login_required
+from app.service import CategoryService
 
-category_bp = Blueprint('category_bp', __name__, url_prefix='/categories')
+category_ns = Namespace("categories", description="Operações relacionadas as categorias de Produtos")
 
-@category_bp.route('/', methods=['GET'])
-def listar_categorias():
-    categorias = CategoryService.listar_todas()
-    resultado = []
-    for c in categorias:
-        resultado.append(c.to_dict())
-    return jsonify(resultado), 200
+category_schema = category_ns.model('CategoryItem', {
+    'name': fields.String(required=True, description='Nome do produto'),
+})
 
-@category_bp.route('/', methods=['POST'])
-def cadastrar_categoria():
-    data = request.get_json()
-    
-    if not data or 'name' not in data:
-        return jsonify({"erro": "Nome da categoria e obrigatorio"}), 400
-        
-    nova_categoria = CategoryService.criar_categoria(data['name'])
-    return jsonify(nova_categoria.to_dict()), 201
+@category_ns.route('/')
+class CategoryController(Resource):
+
+    @category_ns.expect(category_schema)
+    @category_ns.doc(responses={201: 'Created', 400: 'Validation Error', 401: "Unauthorized"})
+    @login_required
+    def post(self):
+        data = request.json
+
+        try:
+            new_category = CategoryService.criar_categoria(
+                data['name'],
+            )
+            return new_category.to_dict(), 201
+
+        except ValueError as e:
+            return {'message': str(e)}, 400
+        except PermissionError as e:
+            return {'message': str(e)}, 401
+        except Exception as e:
+            return {'error': "Internal error processing the request."}, 500

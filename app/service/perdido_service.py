@@ -1,14 +1,14 @@
-from app import db
 from app.models.perdido_model import PerdidoModel
+from app.repository import PerdidoRepository
 
 class PerdidoService:
     @staticmethod
     def listar_todos():
-        return PerdidoModel.query.all()
+        return PerdidoRepository.find_all()
 
     @staticmethod
-    def obter_por_id(perdido_id):
-        return PerdidoModel.query.get(perdido_id)
+    def listar_por_id(perdido_id):
+        return PerdidoRepository.find_by_id(perdido_id)
 
     @staticmethod
     def criar_perdido(nome, descricao):
@@ -16,6 +16,5 @@ class PerdidoService:
             nome=nome,
             descricao=descricao
         )
-        db.session.add(novo_perdido)
-        db.session.commit()
-        return novo_perdido
+
+        return PerdidoRepository.save(novo_perdido)

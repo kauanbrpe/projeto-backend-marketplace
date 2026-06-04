@@ -15,3 +15,7 @@ class PerdidoRepository:
     @staticmethod
     def find_by_user_id(user_id):
         return PerdidoModel.query.filter_by(user_id=user_id).first()
+
+    @staticmethod
+    def find_all():
+        return PerdidoModel.query.all()

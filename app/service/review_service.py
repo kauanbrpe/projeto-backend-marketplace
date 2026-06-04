@@ -1,10 +1,14 @@
-from app import db
 from app.models.review_model import ReviewModel
+from app.repository import ReviewRepository
 
 class ReviewService:
     @staticmethod
     def listar_por_produto(product_id):
-        return ReviewModel.query.filter_by(product_id=product_id).all()
+        return ReviewRepository.find_by_id(product_id)
+
+    @staticmethod
+    def listar_por_user_id(user_id):
+        return ReviewRepository.find_by_user_id(user_id)
 
     @staticmethod
     def criar_avaliacao(user_id, product_id, nota, titulo, comentario):
@@ -21,6 +25,5 @@ class ReviewService:
             title=titulo,       
             comment=comentario
         )
-        db.session.add(nova_review)
-        db.session.commit()
-        return nova_review
+
+        return ReviewRepository.save(nova_review)

@@ -1,18 +1,16 @@
-from app import db
 from app.models.payment_model import PaymentModel
-from app.models.order_model import OrderModel
 import uuid
+from app.repository import PaymentRepository, OrderRepository
 
 class PaymentService:
     @staticmethod
     def obter_por_id(payment_id):
-        return PaymentModel.query.get(payment_id)
+        return PaymentRepository.find_by_id(payment_id)
 
     @staticmethod
     def processar_pagamento(order_id, metodo_pagamento, valor):
-        pedido = OrderModel.query.get(order_id)
-        
-        
+        pedido = OrderRepository.buscar_por_id(order_id)
+
         if not pedido:
             return None  
             
@@ -28,10 +26,8 @@ class PaymentService:
             gateway_transaction_id=str(uuid.uuid4()), 
             status="Aprovado"  
         )
-        db.session.add(novo_pagamento)
         
         
         pedido.status = "Pago"
         
-        db.session.commit()
-        return novo_pagamento
+        return PaymentRepository.save(novo_pagamento)

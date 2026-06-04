@@ -1,5 +1,5 @@
 from app.models.product_model import ProductModel
-from app import db
+from app.repository import ProductRepository
 
 class ProductService:
     @staticmethod
@@ -21,6 +21,23 @@ class ProductService:
             seller_id=dados['seller_id']
         )
 
-        db.session.add(novo_produto)
-        db.session.commit()
-        return novo_produto
+        return ProductRepository.save(novo_produto)
+
+    @staticmethod
+    def listar_produtos():
+        products = ProductRepository.get_all()
+        return [product.to_dict() for product in products]
+
+    @staticmethod
+    def listar_produto_por_id(product_id):
+        product = ProductRepository.find_by_id(product_id)
+        if not product:
+            raise ValueError("Erro: Produto não encontrado!")
+        return product.to_dict()
+
+    @staticmethod
+    def listar_produto_por_user_id(user_id):
+        product = ProductRepository.find_by_user_id(user_id)
+        if not product:
+            raise ValueError("Erro: Produto não encontrado!")
+        return product.to_dict()

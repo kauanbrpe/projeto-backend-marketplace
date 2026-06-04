@@ -1,5 +1,6 @@
 from app.models.category_model import CategoryModel
-from app import db
+from app.repository import CategoryRepository
+
 
 class CategoryService:
     @staticmethod
@@ -12,6 +13,4 @@ class CategoryService:
             name=dados['name']
         )
 
-        db.session.add(nova_categoria)
-        db.session.commit()
-        return nova_categoria
+        return CategoryRepository.save(nova_categoria)

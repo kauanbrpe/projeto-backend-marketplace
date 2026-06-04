@@ -1,37 +1,89 @@
-from flask import Blueprint, jsonify, request
-from app.service.order_service import OrderService
+from flask import request
+from flask_restx import Namespace, Resource, fields
+from flask_login import login_required, current_user
+from app.service import OrderService
 
-order_bp = Blueprint('order_bp', __name__, url_prefix='/orders')
+order_ns = Namespace('orders', description='Operações relacionadas ao gerenciamento de pedidos')
 
-@order_bp.route('/usuario/<int:user_id>', methods=['GET'])
-def listar_pedidos(user_id):
-    pedidos = OrderService.listar_por_usuario(user_id)
-    resultado = []
-    for p in pedidos:
-        resultado.append(p.to_dict())
-    return jsonify(resultado), 200
+item_pedido_schema = order_ns.model('OrderItemInput', {
+    'product_id': fields.Integer(required=True, description='ID do produto'),
+    'quantity': fields.Integer(required=True, description='Quantidade comprada'),
+    'price_at_purchase': fields.Float(required=True, description='Preço unitário no momento da compra')
+})
 
-@order_bp.route('/', methods=['POST'])
-def cadastrar_pedido():
-    data = request.get_json()
-    if not data or 'user_id' not in data or 'itens' not in data or 'total' not in data:
-        return jsonify({"erro": "Dados incompletos"}), 400
-        
-    novo_pedido = OrderService.criar_pedido(data['user_id'], data['itens'], data['total'])
-    return jsonify(novo_pedido.to_dict()), 201
+order_input_schema = order_ns.model('OrderCreateInput', {
+    'itens': fields.List(fields.Nested(item_pedido_schema), required=True, description='Lista de itens do carrinho'),
+    'valor_total': fields.Float(required=True, description='Valor total cobrado pelo pedido')
+})
 
-@order_bp.route('/<int:order_id>/status', methods=['PUT'])
-def alterar_status(order_id):
-    data = request.get_json()
-    if not data or 'status' not in data:
-        return jsonify({"erro": "Status nao informado"}), 400
-        
-    pedido_atualizado = OrderService.atualizar_status(order_id, data['status'])
-    
-    if pedido_atualizado is None:
-        return jsonify({"erro": "Pedido nao encontrado"}), 404
-        
-    if pedido_atualizado is False:
-        return jsonify({"erro": "Mudanca de status invalida pelas regras de negocio"}), 400
-        
-    return jsonify(pedido_atualizado.to_dict()), 200
+order_status_schema = order_ns.model('OrderStatusUpdateInput', {
+    'status': fields.String(required=True, description='Novo status do pedido (Pago, Enviado, Cancelado)', example='Pago')
+})
+
+@order_ns.route('/')
+class OrderList(Resource):
+
+    @order_ns.doc(responses={200: 'Ok', 401: 'Unauthorized'})
+    @login_required
+    def get(self):
+        try:
+            orders = OrderService.listar_por_usuario(current_user.id)
+            return [orders.to_dict() for order in orders], 200
+        except Exception as e:
+            return {"error": "Erro interno ao buscar histórico de pedidos"}, 500
+
+    @order_ns.expect(order_input_schema)
+    @order_ns.doc(responses={201: 'Created', 400: 'Invalid', 401: 'Unauthorized'})
+    @login_required
+    def post(self):
+        data = request.json
+
+        if not data or 'itens' not in data or 'valor_total' not in data:
+            return {"error": "Dados de pedido incompletos"}, 400
+
+        try:
+            new_order = OrderService.criar_pedido(
+                user_id=current_user.id,
+                itens_carrinho=data['itens'],
+                valor_total=data['valor_total']
+            )
+            return new_order, 201
+        except Exception as e:
+            return {"error": "Erro interno ao processar e fechar o pedido"}, 500
+
+@order_ns.route('/<int:order_id>')
+class OrderDetail(Resource):
+
+    @order_ns.doc(responses={200: 'Ok', 403: 'Access prohibited', 404: 'Not found'})
+    @login_required
+    def get(self, order_id):
+        order = OrderService.obter_por_id(order_id)
+
+        if not order:
+            return {"error": "Pedido não encontrado"}, 404
+        if order.user_id != current_user.id and not current_user.is_admin:
+            return {"error": "Acesso negado: Este pedido pertence a outro usuário."}, 403
+
+        return order.to_dict(), 200
+
+    @order_ns.expect(order_status_schema)
+    @order_ns.doc(responses={200: 'Ok', 400: 'Invalid', 403: 'Access prohibited', 404: 'Not found'})
+    @login_required
+    def put(self, order_id):
+        if not current_user.is_admin:
+            return {"error": "Acesso negado: Apenas administradores podem alterar o status de um pedido."}, 403
+
+        data = request.json
+        if not data or 'status' not in data:
+            return {"error": "O campo 'status' é obrigatório"}, 400
+
+        pedido_atualizado = OrderService.atualizar_status(order_id, data['status'])
+
+        if pedido_atualizado is None:
+            return {"error": "Pedido não encontrado"}, 404
+
+        if pedido_atualizado is False:
+            return {
+                "error": f"Mudança de status inválida para as regras de negócio de fluxo do pedido ({data['status']})."}, 400
+
+        return pedido_atualizado.to_dict(), 200

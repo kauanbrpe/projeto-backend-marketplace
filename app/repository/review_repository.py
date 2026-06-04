@@ -15,3 +15,7 @@ class ReviewRepository:
     @staticmethod
     def find_by_product_id(product_id):
         return ReviewModel.query.filter_by(product_id=product_id).all()
+
+    @staticmethod
+    def find_by_user_id(user_id):
+        return ReviewModel.query.get(user_id)

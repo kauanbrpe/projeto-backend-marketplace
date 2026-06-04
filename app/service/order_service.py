@@ -1,14 +1,15 @@
 from app import db
 from app.models.order_model import OrderModel, OrderItemModel
+from app.repository import OrderRepository
 
 class OrderService:
     @staticmethod
     def obter_por_id(order_id):
-        return OrderModel.query.get(order_id)
+        return OrderRepository.buscar_por_id(order_id)
 
     @staticmethod
     def listar_por_usuario(user_id):
-        return OrderModel.query.filter_by(user_id=user_id).all()
+        return OrderRepository.listar_por_usuario(user_id)
 
     @staticmethod
     def criar_pedido(user_id, itens_carrinho, valor_total):
@@ -19,7 +20,7 @@ class OrderService:
             total_price=valor_total
         )
         db.session.add(novo_pedido)
-        db.session.flush()  
+        db.session.flush()
         
         
         for item in itens_carrinho:
@@ -31,12 +32,11 @@ class OrderService:
             )
             db.session.add(item_pedido)
             
-        db.session.commit()
-        return novo_pedido
+        return OrderRepository.criar_pedido(novo_pedido)
 
     @staticmethod
     def atualizar_status(order_id, novo_status):
-        pedido = OrderModel.query.get(order_id)
+        pedido = OrderRepository.buscar_por_id(order_id)
         if not pedido:
             return None
             
@@ -49,5 +49,4 @@ class OrderService:
             return False
             
         pedido.status = novo_status
-        db.session.commit()
-        return pedido
+        return OrderRepository.atualizar_status(novo_status, pedido)

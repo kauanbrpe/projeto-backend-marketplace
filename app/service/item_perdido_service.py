@@ -1,14 +1,18 @@
-from app import db
 from app.models.item_perdido_model import ItemPerdidoModel
+from app.repository import ItemPerdidoRepository
 
 class ItemPerdidoService:
     @staticmethod
     def listar_todos():
-        return ItemPerdidoModel.query.all()
+        return ItemPerdidoRepository.listar_itens()
 
     @staticmethod
-    def obter_por_id(item_id):
-        return ItemPerdidoModel.query.get(item_id)
+    def listar_por_id(item_id):
+        return ItemPerdidoRepository.buscar_por_id(item_id)
+
+    @staticmethod
+    def listar_por_usuario_id(usuario_id):
+        return ItemPerdidoRepository.buscar_por_id(usuario_id)
 
     @staticmethod
     def criar_item_perdido(dados):
@@ -20,6 +24,5 @@ class ItemPerdidoService:
             perdido_id=dados['perdido_id'],
             usuario_id=dados['usuario_id']
         )
-        db.session.add(novo_item)
-        db.session.commit()
-        return novo_item
+
+        return ItemPerdidoRepository.criar_item(novo_item)

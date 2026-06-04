@@ -56,3 +56,32 @@ class CartService:
 
         CartRepository.remove_item(cart.id, product_id)
         return CartRepository.find_by_user_id(current_user.id).to_dict()
+
+    @staticmethod
+    def add_coupon_cart (code_coupon, current_user):
+        if not current_user.is_authenticated:
+            raise PermissionError("Access denied: You need to be logged in.")
+
+        #TODO Importar o CouponService aqui
+        from app.service import CouponService
+
+        cart_obj = CartRepository.find_by_user_id(current_user.id)
+
+        if not cart_obj or not cart_obj.products:
+            raise ValueError("Error: Cart not found.")
+
+        valor_total_bruto = sum(float(produto.price) for produto in cart_obj.products)
+
+        valor_desconto = CouponService.validar_e_calcular_desconto(code_coupon, valor_total_bruto)
+
+        if valor_desconto is None or valor_desconto <= 0:
+            raise ValueError("Error: Valor desconto invalido.")
+
+        valor_final_com_desconto = valor_total_bruto - valor_desconto
+
+        return {
+            "mensagem": f"Cupom {code_coupon.upper()} aplicado com sucesso!",
+            "subtotal": round(valor_total_bruto, 2),
+            "desconto_aplicado": round(valor_desconto, 2),
+            "total_a_pagar": round(max(0.0, valor_final_com_desconto), 2)
+        }

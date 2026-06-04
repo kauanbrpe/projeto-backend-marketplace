@@ -1,7 +1,6 @@
 from app.models.item_perdido_model import ItemPerdidoModel
 from app import db
 
-
 class ItemPerdidoRepository:
 
     @staticmethod

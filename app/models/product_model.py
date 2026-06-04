@@ -19,8 +19,3 @@ class ProductModel(db.Model):
             "stock": self.stock, 
             "category_id": self.category_id, 
             "seller_id": self.seller_id}
-
-    
-    
-    
-    

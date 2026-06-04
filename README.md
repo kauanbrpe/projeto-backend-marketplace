@@ -15,14 +15,14 @@ Este projeto consiste no desenvolvimento de uma **API RESTful** para um marketpl
 
 ## 👥 Integrantes
 
-| Nome |
-|------|
-| Kauan Henrique Silva de Lima |
-| Jefferson Cláudio Veiga |
-| Breno Nascimento Lima |
-| Fábio Pereira da Sousa |
-| Lucas Antônio da Silva |
-| Isabela Inês Maria de Melo |
+| Nome | Função |
+|------|------|
+| Kauan Henrique Silva de Lima | Desenvolvedor Back-end / Integração |
+| Jefferson Cláudio Veiga | Modelagem de dados |
+| Breno Nascimento Lima | Desenvolvedor Front-end / Banco de Dados |
+| Fábio Pereira da Sousa | Desenvolvedor Back-end |
+| Lucas Antônio da Silva | Modelagem de dados |
+| Isabela Inês Maria de Melo | Desenvolvedor Back-end |
 
 ---
 
@@ -99,8 +99,7 @@ pip install -r requirements.txt
 python run.py
 ```
 
-A API estará disponível em `http://localhost:5000`.  
-A documentação interativa (Flask-RESTX) estará em `http://localhost:5000/docs`.
+A API estará disponível em `http://127.0.0.1:5000/`.
 
 ---
 
