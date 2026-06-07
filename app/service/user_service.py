@@ -1,6 +1,6 @@
 from app.models import UserModel
 from app.repository import UserRepository
-from werkzeug.security import check_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user
 
 class UserService:
@@ -17,7 +17,7 @@ class UserService:
             name=data['name'],
             email=data['email'],
             endereco=data['endereco'],
-            password_hash=data['password'],
+            password_hash=generate_password_hash(data['password']),
             is_admin = data.get('is_admin', False)
         )
 

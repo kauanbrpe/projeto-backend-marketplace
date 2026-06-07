@@ -8,7 +8,7 @@ user_ns = Namespace('users', description='Operações relacionadas à autentica�
 user_register_schema = user_ns.model('UserRegisterInput', {
     'name': fields.String(required=True, description='Nome completo do usuário', example='João Silva'),
     'email': fields.String(required=True, description='Endereço de e-mail único', example='joao@email.com'),
-    'password': fields.String(required=False, description='Senha de acesso', example='senha123'),
+    'password': fields.String(required=True, description='Senha de acesso', example='senha123'),
     'endereco': fields.String(required=True, description='Endereço residencial', example='Rua das Flores, 123'),
     'is_admin': fields.Boolean(required=False, description='Define se o usuário é administrador', default=False)
 })

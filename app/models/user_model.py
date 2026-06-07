@@ -9,7 +9,7 @@ class UserModel(db.Model, UserMixin):
     email= db.Column(db.String(120), unique=True, nullable=False)
     endereco = db.Column(db.String(80), nullable=False)
 
-    password_hash = db.Column(db.String(128), nullable=False)
+    password_hash = db.Column(db.String(256), nullable=False)
 
     is_admin = db.Column(db.Boolean, default=False, nullable=False)
 
