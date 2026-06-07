@@ -1,6 +1,6 @@
 from app.models import UserModel
 from app.repository import UserRepository
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import check_password_hash
 from flask_login import login_user, logout_user
 
 class UserService:
@@ -13,13 +13,11 @@ class UserService:
         if existing_user:
             raise ValueError("Error: Email already exists.")
 
-        encrypted_password = generate_password_hash(data['password'])
-
         new_user = UserModel(
             name=data['name'],
             email=data['email'],
             endereco=data['endereco'],
-            password_hash=encrypted_password,
+            password_hash=data['password'],
             is_admin = data.get('is_admin', False)
         )
 

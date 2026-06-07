@@ -1,5 +1,3 @@
-import secrets
-import string
 from flask import request
 from flask_restx import Namespace, Resource, fields
 from flask_login import login_required, current_user
@@ -38,23 +36,9 @@ class UserRegister(Resource):
     def post(self):
         data = request.json
 
-        
-        if not data.get('password'):
-            alphabet = string.ascii_letters + string.digits
-            data['password'] = ''.join(secrets.choice(alphabet) for _ in range(12))
-            generated_password = data['password']
-        else:
-            generated_password = None
-
         try:
             new_user = UserService.user_registration(data)
-            response = new_user.to_dict()
-
-            
-            if generated_password:
-                response['generated_password'] = generated_password
-
-            return response, 201
+            return new_user.to_dict(), 201
         except ValueError as e:
             return {"error": str(e)}, 400
         except Exception as e:
