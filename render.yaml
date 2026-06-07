@@ -3,7 +3,7 @@ services:
     name: marketplace-flask
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app
+    startCommand: gunicorn run:application
     envVars:
       - key: DATABASE_URL
         fromDatabase:
