@@ -1,3 +1,5 @@
+import secrets
+import string
 from flask import request
 from flask_restx import Namespace, Resource, fields
 from flask_login import login_required, current_user
@@ -8,7 +10,7 @@ user_ns = Namespace('users', description='Operações relacionadas à autentica�
 user_register_schema = user_ns.model('UserRegisterInput', {
     'name': fields.String(required=True, description='Nome completo do usuário', example='João Silva'),
     'email': fields.String(required=True, description='Endereço de e-mail único', example='joao@email.com'),
-    'password': fields.String(required=True, description='Senha de acesso', example='senha123'),
+    'password': fields.String(required=False, description='Senha de acesso', example='senha123'),
     'endereco': fields.String(required=True, description='Endereço residencial', example='Rua das Flores, 123'),
     'is_admin': fields.Boolean(required=False, description='Define se o usuário é administrador', default=False)
 })
@@ -26,6 +28,8 @@ user_output_schema = user_ns.model('UserOutput', {
     'is_admin': fields.Boolean(description='Status de administrador')
 })
 
+
+
 @user_ns.route('/register')
 class UserRegister(Resource):
 
@@ -34,9 +38,23 @@ class UserRegister(Resource):
     def post(self):
         data = request.json
 
+        
+        if not data.get('password'):
+            alphabet = string.ascii_letters + string.digits
+            data['password'] = ''.join(secrets.choice(alphabet) for _ in range(12))
+            generated_password = data['password']
+        else:
+            generated_password = None
+
         try:
             new_user = UserService.user_registration(data)
-            return new_user.to_dict(), 201
+            response = new_user.to_dict()
+
+            
+            if generated_password:
+                response['generated_password'] = generated_password
+
+            return response, 201
         except ValueError as e:
             return {"error": str(e)}, 400
         except Exception as e:
