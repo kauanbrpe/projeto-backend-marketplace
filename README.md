@@ -15,14 +15,14 @@ Este projeto consiste no desenvolvimento de uma **API RESTful** para um marketpl
 
 ## 👥 Integrantes
 
-| Nome | Função |
-|------|------|
-| Kauan Henrique Silva de Lima | Desenvolvedor Back-end / Integração |
-| Jefferson Cláudio Veiga | Modelagem de dados |
-| Breno Nascimento Lima | Desenvolvedor Front-end / Banco de Dados |
-| Fábio Pereira da Sousa | Desenvolvedor Back-end |
-| Lucas Antônio da Silva | Modelagem de dados |
-| Isabela Inês Maria de Melo | Desenvolvedor Back-end |
+| Nome | Função                          |
+|------|---------------------------------|
+| Kauan Henrique Silva de Lima | Desenvolvedor Back-end / Deploy |
+| Jefferson Cláudio Veiga | Modelagem de Dados / Tester     |
+| Breno Nascimento Lima | Banco de Dados / Tester         |
+| Fábio Pereira da Sousa | Desenvolvedor Back-end / Tester |
+| Lucas Antônio da Silva | Modelagem de dados              |
+| Isabela Inês Maria de Melo | Tester                          |
 
 ---
 
