@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Config:
+    SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
+
     DATABASE_URL = os.getenv('DATABASE_URL')
 
     if DATABASE_URL and DATABASE_URL.startswith("postgres://"):

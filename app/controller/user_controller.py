@@ -71,6 +71,7 @@ class UserLogin(Resource):
         except ValueError as e:
             return {"error": str(e)}, 400
         except Exception as e:
+            print(f"ERRO: {type(e).__name__}: {e}")
             return {"error": "Erro interno ao realizar login"}, 500
 
 @user_ns.route('/logout')
