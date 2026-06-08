@@ -13,7 +13,6 @@ class OrderService:
 
     @staticmethod
     def criar_pedido(user_id, itens_carrinho, valor_total):
-        
         novo_pedido = OrderModel(
             user_id=user_id,
             status="Criado",
@@ -21,8 +20,7 @@ class OrderService:
         )
         db.session.add(novo_pedido)
         db.session.flush()
-        
-        
+
         for item in itens_carrinho:
             item_pedido = OrderItemModel(
                 order_id=novo_pedido.id,
@@ -31,22 +29,32 @@ class OrderService:
                 historic_price=item['price_at_purchase']
             )
             db.session.add(item_pedido)
-            
-        return OrderRepository.criar_pedido(novo_pedido)
+
+        db.session.commit()
+        return novo_pedido
 
     @staticmethod
     def atualizar_status(order_id, novo_status):
         pedido = OrderRepository.buscar_por_id(order_id)
         if not pedido:
             return None
-            
-        
+
         if novo_status == "Enviado" and pedido.status != "Pago":
             return False
-            
-        
+
         if novo_status == "Cancelado" and pedido.status == "Enviado":
             return False
-            
-        pedido.status = novo_status
-        return OrderRepository.atualizar_status(novo_status, pedido)
+
+        return OrderRepository.atualizar_status(pedido, novo_status)
+
+    @staticmethod
+    def deletar_pedido(order_id, current_user):
+        pedido = OrderRepository.buscar_por_id(order_id)
+        if not pedido:
+            raise ValueError("Erro: Pedido não encontrado!")
+
+        if pedido.user_id != current_user.id and not current_user.is_admin:
+            raise PermissionError("Acesso negado: Você não pode excluir o pedido de outro usuário.")
+
+        OrderRepository.deletar_pedido(pedido)
+        return True

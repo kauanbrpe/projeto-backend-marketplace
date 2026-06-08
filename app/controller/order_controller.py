@@ -28,7 +28,7 @@ class OrderList(Resource):
     def get(self):
         try:
             orders = OrderService.listar_por_usuario(current_user.id)
-            return [orders.to_dict() for order in orders], 200
+            return [order.to_dict() for order in orders], 200
         except Exception as e:
             return {"error": "Erro interno ao buscar histórico de pedidos"}, 500
 
@@ -47,11 +47,12 @@ class OrderList(Resource):
                 itens_carrinho=data['itens'],
                 valor_total=data['valor_total']
             )
-            return new_order, 201
+            return new_order.to_dict(), 201
         except Exception as e:
             return {"error": "Erro interno ao processar e fechar o pedido"}, 500
 
 @order_ns.route('/<int:order_id>')
+@order_ns.doc(params={'order_id': 'O identificador único do pedido'})
 class OrderDetail(Resource):
 
     @order_ns.doc(responses={200: 'Ok', 403: 'Access prohibited', 404: 'Not found'})
@@ -83,7 +84,19 @@ class OrderDetail(Resource):
             return {"error": "Pedido não encontrado"}, 404
 
         if pedido_atualizado is False:
-            return {
-                "error": f"Mudança de status inválida para as regras de negócio de fluxo do pedido ({data['status']})."}, 400
+            return {"error": f"Mudança de status inválida para as regras de negócio de fluxo do pedido ({data['status']})."}, 400
 
         return pedido_atualizado.to_dict(), 200
+
+    @order_ns.doc(responses={200: 'Ok', 401: 'Unauthorized', 403: 'Forbidden', 404: 'Not Found'})
+    @login_required
+    def delete(self, order_id):
+        try:
+            OrderService.deletar_pedido(order_id, current_user)
+            return {"message": "Pedido excluído com sucesso."}, 200
+        except ValueError as e:
+            return {"error": str(e)}, 404
+        except PermissionError as e:
+            return {"error": str(e)}, 403
+        except Exception as e:
+            return {"error": "Erro interno ao excluir o pedido."}, 500

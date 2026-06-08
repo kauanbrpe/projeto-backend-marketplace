@@ -43,4 +43,13 @@ class CartRepository:
             (cart_items.c.product_id == product_id)
         )
         result = db.session.execute(stmt)
-        return result
+        return result.scalar()
+
+    @staticmethod
+    def put_item_quantity(cart_id, product_id, quantity):
+        stmt = cart_items.update().where(
+            (cart_items.c.cart_id == cart_id) &
+            (cart_items.c.product_id == product_id)
+        ).values(quantity=quantity)
+        db.session.execute(stmt)
+        db.session.commit()

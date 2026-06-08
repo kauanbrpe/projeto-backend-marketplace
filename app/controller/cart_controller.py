@@ -6,8 +6,13 @@ from app.service import CartService
 cart_ns = Namespace('carts', description='Operações relacionadas ao carrinho de compras')
 
 cart_item_schema = cart_ns.model('CartItemInput', {
-    'product_id': fields.Integer(required=True, description='ID do produto a ser adicionado'),
+    'product_id': fields.Integer(required=True, description='ID do produto'),
     'quantity': fields.Integer(required=True, description='Quantidade do produto', default=1)
+})
+
+cart_update_schema = cart_ns.model('CartUpdateInput', {
+    'product_id': fields.Integer(required=True, description='ID do produto'),
+    'quantity': fields.Integer(required=True, description='Nova quantidade desejada')
 })
 
 @cart_ns.route('/')
@@ -22,7 +27,7 @@ class CartController(Resource):
         except PermissionError as e:
             return {'error': str(e)}, 401
         except Exception as e:
-            return {'error': "Internal error while retrieving shopping cart."}, 500
+            return {'error': "Erro interno ao recuperar o carrinho."}, 500
 
     @cart_ns.expect(cart_item_schema)
     @cart_ns.doc(responses={200: 'Ok', 400: 'Validation/Inventory Error', 401: 'Unauthorized'})
@@ -40,11 +45,33 @@ class CartController(Resource):
                 current_user=current_user
             )
             return updated_cart, 200
-
         except ValueError as e:
             return {'error': str(e)}, 400
         except PermissionError as e:
             return {'error': str(e)}, 401
+
+    @cart_ns.expect(cart_update_schema)
+    @cart_ns.doc(responses={200: 'Ok', 400: 'Invalid', 401: 'Unauthorized'})
+    @login_required
+    def put(self):
+        data = request.json
+
+        if not data or 'product_id' not in data or 'quantity' not in data:
+            return {'error': 'Missing product_id or quantity'}, 400
+
+        try:
+            updated_cart = CartService.update_product_quantity(
+                product_id=data['product_id'],
+                quantity=data['quantity'],
+                current_user=current_user
+            )
+            return updated_cart, 200
+        except ValueError as e:
+            return {'error': str(e)}, 400
+        except PermissionError as e:
+            return {'error': str(e)}, 401
+        except Exception as e:
+            return {'error': "Erro interno ao atualizar o carrinho."}, 500
 
     @cart_ns.expect(cart_item_schema)
     @cart_ns.doc(responses={200: 'Ok', 400: 'Validation/Inventory Error', 401: 'Unauthorized'})
@@ -52,8 +79,8 @@ class CartController(Resource):
     def delete(self):
         data = request.json
 
-        if not data or 'product_id' not in data or 'quantity' not in data:
-            return {'error': 'Missing product or quantity'}, 400
+        if not data or 'product_id' not in data:
+            return {'error': 'Missing product_id'}, 400
 
         try:
             removed_cart = CartService.remove_product(
@@ -61,7 +88,6 @@ class CartController(Resource):
                 current_user=current_user
             )
             return removed_cart, 200
-
         except ValueError as e:
             return {'error': str(e)}, 400
         except PermissionError as e:
@@ -78,7 +104,6 @@ class CartApplyCoupon(Resource):
     @cart_ns.doc(responses={200: 'Ok', 400: 'Invalid', 401: 'Unauthorized'})
     @login_required
     def post(self):
-
         data = request.json
 
         if not data or 'code' not in data:
@@ -90,7 +115,6 @@ class CartApplyCoupon(Resource):
                 current_user=current_user
             )
             return result, 200
-
         except ValueError as e:
             return {'error': str(e)}, 400
         except PermissionError as e:

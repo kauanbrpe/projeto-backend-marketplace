@@ -9,8 +9,8 @@ class ComplaintRepository:
         return complaint
 
     @staticmethod
-    def find_by_id(id):
-        return ComplaintModel.query.get(id)
+    def find_by_id(complaint_id):
+        return ComplaintModel.query.get(complaint_id)
 
     @staticmethod
     def find_by_order_id(order_id):
@@ -19,3 +19,19 @@ class ComplaintRepository:
     @staticmethod
     def find_by_user_id(user_id):
         return ComplaintModel.query.filter_by(user_id=user_id).all()
+
+    @staticmethod
+    def find_all():
+        return ComplaintModel.query.all()
+
+    @staticmethod
+    def update(complaint):
+        db.session.add(complaint)
+        db.session.commit()
+        return complaint
+
+    @staticmethod
+    def delete(complaint):
+        db.session.delete(complaint)
+        db.session.commit()
+        return True

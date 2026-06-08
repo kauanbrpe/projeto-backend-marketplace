@@ -19,3 +19,15 @@ class PerdidoRepository:
     @staticmethod
     def find_all():
         return PerdidoModel.query.all()
+
+    @staticmethod
+    def update(perdido):
+        db.session.add(perdido)
+        db.session.commit()
+        return perdido
+
+    @staticmethod
+    def delete(perdido):
+        db.session.delete(perdido)
+        db.session.commit()
+        return True

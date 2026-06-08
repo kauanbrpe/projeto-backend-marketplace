@@ -9,7 +9,7 @@ class CouponService:
         if not current_user.is_authenticated or not current_user.is_admin:
             raise PermissionError("Permission denied.")
 
-        cupons = CouponModel.query.all()
+        cupons = CouponRepository.find_all()
         return [cupom.to_dict() for cupom in cupons]
 
     @staticmethod
@@ -18,7 +18,7 @@ class CouponService:
             raise PermissionError("Permission denied.")
 
         if not data.get('code') or not data.get('discount_type') or not data.get('discount_value') or not data.get('expiration_date'):
-            raise ValueError("Required fields")
+            raise ValueError("Required fields missing.")
 
         coupom_existente = CouponRepository.find_by_code(data['code'])
         if coupom_existente:
@@ -43,44 +43,48 @@ class CouponService:
 
     @staticmethod
     def obter_por_id(coupon_id):
-        return CouponModel.query.get(coupon_id)
+        return CouponRepository.find_by_id(coupon_id)
 
     @staticmethod
     def validar_e_calcular_desconto(codigo, valor_total_pedido):
-        cupom = CouponRepository.find_by_code(codigo).first
-        
-        if not cupom:
-            return None  
-            
-        
-        if not cupom.is_active:
+        cupom = CouponRepository.find_by_code(codigo)
+
+        if not cupom or not cupom.is_active:
             return None
-            
-        
+
         if datetime.now() > cupom.expiration_date:
             return None
-            
-        
+
         if cupom.used_count >= cupom.max_uses:
             return None
-            
-        
+
         if valor_total_pedido < cupom.min_order_value:
             return None
-            
-        
+
         if cupom.discount_type == "percent":
             desconto = valor_total_pedido * (cupom.discount_value / 100)
         else:
             desconto = cupom.discount_value
-            
+
         return desconto
 
     @staticmethod
     def incrementar_uso(coupon_id):
         cupom = CouponRepository.find_by_id(coupon_id)
         if cupom:
-            cupom.used_count = cupom.used_count + 1  # Incremento simples [cite: 223]
+            cupom.used_count += 1
             db.session.commit()
             return True
         return False
+
+    @staticmethod
+    def deletar_cupom(coupon_id, current_user):
+        if not current_user.is_admin:
+            raise PermissionError("Acesso negado: Apenas administradores podem excluir cupons.")
+
+        cupom = CouponRepository.find_by_id(coupon_id)
+        if not cupom:
+            raise ValueError("Erro: Cupom não encontrado!")
+
+        CouponRepository.delete(cupom)
+        return True

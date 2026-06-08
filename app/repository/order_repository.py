@@ -1,7 +1,6 @@
 from app.models.order_model import OrderModel, OrderItemModel
 from app import db
 
-
 class OrderRepository:
 
     @staticmethod
@@ -56,3 +55,4 @@ class OrderRepository:
     def deletar_pedido(order):
         db.session.delete(order)
         db.session.commit()
+        return True

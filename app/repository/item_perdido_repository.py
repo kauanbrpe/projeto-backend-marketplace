@@ -13,10 +13,8 @@ class ItemPerdidoRepository:
             perdido_id=data['perdido_id'],
             usuario_id=data['usuario_id']
         )
-
         db.session.add(novo_item)
         db.session.commit()
-
         return novo_item
 
     @staticmethod
@@ -35,12 +33,11 @@ class ItemPerdidoRepository:
         item.data_perdido = data.get('data_perdido', item.data_perdido)
         item.perdido_id = data.get('perdido_id', item.perdido_id)
         item.usuario_id = data.get('usuario_id', item.usuario_id)
-
         db.session.commit()
-
         return item
 
     @staticmethod
     def deletar_item(item):
         db.session.delete(item)
         db.session.commit()
+        return True

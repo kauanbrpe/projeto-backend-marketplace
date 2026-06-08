@@ -18,6 +18,14 @@ user_login_schema = user_ns.model('UserLoginInput', {
     'password': fields.String(required=True, description='Senha cadastrada', example='senha123')
 })
 
+user_update_schema = user_ns.model('UserUpdateInput', {
+    'name': fields.String(required=False, description='Novo nome'),
+    'email': fields.String(required=False, description='Novo e-mail'),
+    'password': fields.String(required=False, description='Nova senha'),
+    'endereco': fields.String(required=False, description='Novo endereço'),
+    'is_admin': fields.Boolean(required=False, description='Status de administrador')
+})
+
 user_output_schema = user_ns.model('UserOutput', {
     'id': fields.Integer(description='ID único do usuário'),
     'name': fields.String(description='Nome completo'),
@@ -25,7 +33,6 @@ user_output_schema = user_ns.model('UserOutput', {
     'endereco': fields.String(description='Endereço'),
     'is_admin': fields.Boolean(description='Status de administrador')
 })
-
 
 
 @user_ns.route('/register')
@@ -72,7 +79,6 @@ class UserLogout(Resource):
     @user_ns.doc(responses={200: 'Ok', 401: 'Unauthorized'})
     @login_required
     def post(self):
-
         try:
             UserService.logout()
             return {"message": "Logged out successfully."}, 200
@@ -87,3 +93,40 @@ class UserProfile(Resource):
     @login_required
     def get(self):
         return current_user, 200
+
+@user_ns.route('/<int:user_id>')
+@user_ns.doc(params={'user_id': 'O identificador único do usuário'})
+class UserDetail(Resource):
+
+    @user_ns.expect(user_update_schema)
+    @user_ns.doc(responses={200: 'Ok', 400: 'Invalid', 401: 'Unauthorized', 403: 'Forbidden', 404: 'Not Found'})
+    @login_required
+    def put(self, user_id):
+        if current_user.id != user_id and not current_user.is_admin:
+            return {"error": "Acesso negado: Você não pode editar dados de outro usuário."}, 403
+
+        data = request.json
+        if not data:
+            return {"error": "Nenhum dado enviado para atualização."}, 400
+
+        try:
+            updated_user = UserService.update_user(user_id, data)
+            return updated_user.to_dict(), 200
+        except ValueError as e:
+            return {"error": str(e)}, 404
+        except Exception as e:
+            return {"error": "Erro interno ao atualizar o usuário."}, 500
+
+    @user_ns.doc(responses={200: 'Ok', 401: 'Unauthorized', 403: 'Forbidden', 404: 'Not Found'})
+    @login_required
+    def delete(self, user_id):
+        if current_user.id != user_id and not current_user.is_admin:
+            return {"error": "Acesso negado: Você não pode excluir a conta de outro usuário."}, 403
+
+        try:
+            UserService.delete_user(user_id)
+            return {"message": "Usuário excluído com sucesso."}, 200
+        except ValueError as e:
+            return {"error": str(e)}, 404
+        except Exception as e:
+            return {"error": "Erro interno ao excluir o usuário."}, 500

@@ -12,6 +12,11 @@ payment_input_schema = payment_ns.model('PaymentInput', {
     'valor': fields.Float(required=True, description='Valor enviado para pagamento', example=150.00)
 })
 
+payment_update_schema = payment_ns.model('PaymentUpdateInput', {
+    'status': fields.String(required=False, description='Novo status do pagamento', example='Estornado'),
+    'payment_method': fields.String(required=False, description='Método de pagamento')
+})
+
 payment_output_schema = payment_ns.model('PaymentOutput', {
     'id': fields.Integer(description='ID único do registro de pagamento'),
     'order_id': fields.Integer(description='ID do pedido associado'),
@@ -37,7 +42,7 @@ class PaymentProcess(Resource):
         if not order:
             return {"error": "Pedido não encontrado para faturamento."}, 404
 
-        if order.user_id != current_user and not current_user.is_admin:
+        if order.user_id != current_user.id and not current_user.is_admin:
             return {"error": "Acesso negado: Você não pode pagar um pedido que pertence a outro usuário."}, 403
 
         try:
@@ -51,8 +56,7 @@ class PaymentProcess(Resource):
                 return {"error": "Erro ao localizar o pedido informado."}, 404
 
             if result is False:
-                return {
-                    "error": f"Erro no pagamento: O valor enviado (R$ {data['valor']:.2f}) é menor do que o total do pedido (R$ {float(order.total_price):.2f})."}, 400
+                return {"error": f"Erro no pagamento: O valor enviado (R$ {data['valor']:.2f}) é menor do que o total do pedido (R$ {float(order.total_price):.2f})."}, 400
 
             return result.to_dict(), 201
 
@@ -66,15 +70,45 @@ class PaymentDetail(Resource):
     @payment_ns.doc(responses={200: 'Ok', 403: 'Access Denied', 404: 'Not Found'})
     @payment_ns.marshal_with(payment_output_schema)
     @login_required
-    def get(self,payment_id):
+    def get(self, payment_id):
         payment = PaymentService.obter_por_id(payment_id)
 
         if not payment:
             return {"error": "Registro de pagamento não encontrado."}, 404
 
         order = OrderModel.query.get(payment.order_id)
-        
         if order and order.user_id != current_user.id and not current_user.is_admin:
             return {"error": "Acesso negado: Este registro pertence à transação de outro usuário."}, 403
 
         return payment, 200
+
+    @payment_ns.expect(payment_update_schema)
+    @payment_ns.doc(responses={200: 'Ok', 401: 'Unauthorized', 403: 'Forbidden', 404: 'Not Found'})
+    @login_required
+    def put(self, payment_id):
+        data = request.json
+        if not data:
+            return {"error": "Nenhum dado enviado para atualização."}, 400
+
+        try:
+            updated = PaymentService.atualizar_pagamento(payment_id, data, current_user)
+            return updated.to_dict(), 200
+        except ValueError as e:
+            return {"error": str(e)}, 404
+        except PermissionError as e:
+            return {"error": str(e)}, 403
+        except Exception as e:
+            return {"error": "Erro interno ao atualizar o pagamento."}, 500
+
+    @payment_ns.doc(responses={200: 'Ok', 401: 'Unauthorized', 403: 'Forbidden', 404: 'Not Found'})
+    @login_required
+    def delete(self, payment_id):
+        try:
+            PaymentService.deletar_pagamento(payment_id, current_user)
+            return {"message": "Pagamento excluído com sucesso."}, 200
+        except ValueError as e:
+            return {"error": str(e)}, 404
+        except PermissionError as e:
+            return {"error": str(e)}, 403
+        except Exception as e:
+            return {"error": "Erro interno ao excluir o pagamento."}, 500

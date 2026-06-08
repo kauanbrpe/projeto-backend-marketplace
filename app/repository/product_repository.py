@@ -18,4 +18,16 @@ class ProductRepository:
 
     @staticmethod
     def find_by_user_id(user_id):
-        return ProductModel.query.get(user_id)
+        return ProductModel.query.filter_by(seller_id=user_id).all()
+
+    @staticmethod
+    def update(product):
+        db.session.add(product)
+        db.session.commit()
+        return product
+
+    @staticmethod
+    def delete(product):
+        db.session.delete(product)
+        db.session.commit()
+        return True

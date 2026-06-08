@@ -15,3 +15,15 @@ class PaymentRepository:
     @staticmethod
     def find_by_order_id(order_id):
         return PaymentModel.query.filter_by(order_id=order_id).first()
+
+    @staticmethod
+    def update(payment):
+        db.session.add(payment)
+        db.session.commit()
+        return payment
+
+    @staticmethod
+    def delete(payment):
+        db.session.delete(payment)
+        db.session.commit()
+        return True

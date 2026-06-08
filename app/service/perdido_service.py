@@ -16,5 +16,26 @@ class PerdidoService:
             nome=nome,
             descricao=descricao
         )
-
         return PerdidoRepository.save(novo_perdido)
+
+    @staticmethod
+    def atualizar_perdido(perdido_id, dados):
+        perdido = PerdidoRepository.find_by_id(perdido_id)
+        if not perdido:
+            raise ValueError("Erro: Perdido não encontrado!")
+
+        if 'nome' in dados:
+            perdido.nome = dados['nome']
+        if 'descricao' in dados:
+            perdido.descricao = dados['descricao']
+
+        return PerdidoRepository.update(perdido)
+
+    @staticmethod
+    def deletar_perdido(perdido_id):
+        perdido = PerdidoRepository.find_by_id(perdido_id)
+        if not perdido:
+            raise ValueError("Erro: Perdido não encontrado!")
+
+        PerdidoRepository.delete(perdido)
+        return True

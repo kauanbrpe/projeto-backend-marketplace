@@ -15,3 +15,17 @@ class UserRepository:
     @staticmethod
     def find_by_email(email):
         return UserModel.query.filter_by(email=email).first()
+
+    @staticmethod
+    def update_user(user):
+        db.session.add(user)
+        db.session.commit()
+        return user
+
+    @staticmethod
+    def delete_user(user_id):
+        user = UserModel.query.get(user_id)
+        if user:
+            db.session.delete(user)
+            db.session.commit()
+        return user

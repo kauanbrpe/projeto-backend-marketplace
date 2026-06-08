@@ -85,3 +85,24 @@ class CartService:
             "desconto_aplicado": round(valor_desconto, 2),
             "total_a_pagar": round(max(0.0, valor_final_com_desconto), 2)
         }
+    @staticmethod
+    def update_product_quantity(product_id, quantity, current_user):
+        if not current_user.is_authenticated:
+            raise PermissionError("Access denied: You need to be logged in.")
+
+        if quantity <= 0:
+            raise ValueError("Error: Quantity must be greater than 0.")
+
+        product = ProductRepository.find_by_id(product_id)
+        if not product:
+            raise ValueError("Error: Product not found.")
+
+        if product.stock < quantity:
+            raise ValueError(f"Error: Product stock is lower than quantity. Available: {product.stock}")
+
+        cart = CartRepository.find_by_user_id(current_user.id)
+        if not cart:
+            raise ValueError("Error: Cart not found.")
+
+        CartRepository.update_item_quantity(cart.id, product_id, quantity)
+        return CartRepository.find_by_user_id(current_user.id).to_dict()

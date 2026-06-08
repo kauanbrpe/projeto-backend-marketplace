@@ -10,10 +10,15 @@ perdido_input_schema = perdido_ns.model('PerdidoInput', {
     'descricao': fields.String(required=True, description='Descrição do Perdido')
 })
 
+perdido_update_schema = perdido_ns.model('PerdidoUpdateInput', {
+    'nome': fields.String(required=False, description='Novo nome'),
+    'descricao': fields.String(required=False, description='Nova descrição')
+})
+
 perdido_output_schema = perdido_ns.model('PerdidoOutput', {
-    'id': fields.Integer(required=True, description='ID do Perdido'),
-    'nome': fields.String(required=True, description='Nome do Perdido'),
-    'descricao': fields.String(required=True, description='Descrição do Perdido'),
+    'id': fields.Integer(description='ID do Perdido'),
+    'nome': fields.String(description='Nome do Perdido'),
+    'descricao': fields.String(description='Descrição do Perdido'),
 })
 
 @perdido_ns.route('/')
@@ -25,7 +30,7 @@ class PerdidoList(Resource):
         try:
             return PerdidoService.listar_todos(), 200
         except Exception as e:
-            return {"error": "Erro interno ao listar os itens perdidos."}, 500
+            return {"error": "Erro interno ao listar os perdidos."}, 500
 
     @perdido_ns.expect(perdido_input_schema)
     @perdido_ns.doc(responses={201: 'Created', 400: 'Invalid', 401: 'Unauthorized'})
@@ -34,14 +39,13 @@ class PerdidoList(Resource):
         data = request.json
 
         try:
-            data['usuario_id'] = current_user.id
             new_item = PerdidoService.criar_perdido(
                 nome=data['nome'],
                 descricao=data['descricao'],
             )
             return new_item.to_dict(), 201
         except Exception as e:
-            return {"error": "Erro interno ao cadastrar o item perdido."}, 500
+            return {"error": "Erro interno ao cadastrar o perdido."}, 500
 
 @perdido_ns.route('/<int:perdido_id>')
 @perdido_ns.doc(params={'perdido_id': 'O identificador único do perdido'})
@@ -52,5 +56,32 @@ class PerdidoDetail(Resource):
     def get(self, perdido_id):
         item = PerdidoService.listar_por_id(perdido_id)
         if not item:
-            return {"error": "Item perdido não encontrado."}, 404
+            return {"error": "Perdido não encontrado."}, 404
         return item, 200
+
+    @perdido_ns.expect(perdido_update_schema)
+    @perdido_ns.doc(responses={200: 'Ok', 400: 'Invalid', 401: 'Unauthorized', 404: 'Not Found'})
+    @login_required
+    def put(self, perdido_id):
+        data = request.json
+        if not data:
+            return {"error": "Nenhum dado enviado para atualização."}, 400
+
+        try:
+            updated = PerdidoService.atualizar_perdido(perdido_id, data)
+            return updated.to_dict(), 200
+        except ValueError as e:
+            return {"error": str(e)}, 404
+        except Exception as e:
+            return {"error": "Erro interno ao atualizar o perdido."}, 500
+
+    @perdido_ns.doc(responses={200: 'Ok', 401: 'Unauthorized', 404: 'Not Found'})
+    @login_required
+    def delete(self, perdido_id):
+        try:
+            PerdidoService.deletar_perdido(perdido_id)
+            return {"message": "Perdido excluído com sucesso."}, 200
+        except ValueError as e:
+            return {"error": str(e)}, 404
+        except Exception as e:
+            return {"error": "Erro interno ao excluir o perdido."}, 500

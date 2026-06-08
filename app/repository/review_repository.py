@@ -18,4 +18,16 @@ class ReviewRepository:
 
     @staticmethod
     def find_by_user_id(user_id):
-        return ReviewModel.query.get(user_id)
+        return ReviewModel.query.filter_by(user_id=user_id).all()
+
+    @staticmethod
+    def update(review):
+        db.session.add(review)
+        db.session.commit()
+        return review
+
+    @staticmethod
+    def delete(review):
+        db.session.delete(review)
+        db.session.commit()
+        return True
