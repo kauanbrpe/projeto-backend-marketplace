@@ -23,7 +23,7 @@ class ItemPerdidoRepository:
 
     @staticmethod
     def buscar_por_id(item_id):
-        return ItemPerdidoModel.query.get(item_id)
+        return db.session.get(ItemPerdidoModel, item_id)
 
     @staticmethod
     def atualizar_item(item, data):

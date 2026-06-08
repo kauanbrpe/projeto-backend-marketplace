@@ -22,8 +22,7 @@ class ProductService:
 
     @staticmethod
     def listar_produtos():
-        products = ProductRepository.get_all()
-        return [product.to_dict() for product in products]
+        return ProductRepository.get_all()
 
     @staticmethod
     def listar_produto_por_id(product_id):

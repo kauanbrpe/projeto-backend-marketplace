@@ -7,7 +7,7 @@ class CouponModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(50), unique=True, nullable=False)
     discount_type = db.Column(db.String(20), nullable=False, default='fixed')
-    discount_value = db.Column(db.Numeric(precision=1, scale=2), nullable=False)
+    discount_value = db.Column(db.Numeric(precision=10, scale=2), nullable=False)
     min_order_value = db.Column(db.Numeric(precision=10, scale=2), default=0.00, nullable=False)
     expiration_date = db.Column(db.DateTime, nullable=False)
     max_uses = db.Column(db.Integer, default=100, nullable=False)
@@ -31,7 +31,7 @@ class CouponModel(db.Model):
             "id": self.id,
             "code": self.code,
             "discount_type": self.discount_type,
-            "discount_value": self.discount_value,
+            "discount_value": float(self.discount_value),
             "min_order_value": float(self.min_order_value),
             "expiration_date": self.expiration_date.isoformat(),
             "max_uses": self.max_uses,

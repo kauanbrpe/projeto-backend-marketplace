@@ -25,7 +25,7 @@ class OrderModel(db.Model):
             "id": self.id,
             "user_id": self.user_id,
             "status": self.status,
-            "total_price": self.total_price,
+            "total_price": float(self.total_price),
             "created_at": self.created_at.isoformat(),
             "items": [
                 {

@@ -111,5 +111,5 @@ class ItemPerdidoDetailUser(Resource):
     def get(self, user_id):
         items = ItemPerdidoService.listar_por_usuario_id(user_id)
         if not items:
-            return {"error": "Usuário não tem itens perdidos."}, 404
+            return [], 200
         return items, 200

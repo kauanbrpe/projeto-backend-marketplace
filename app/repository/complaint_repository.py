@@ -10,7 +10,7 @@ class ComplaintRepository:
 
     @staticmethod
     def find_by_id(complaint_id):
-        return ComplaintModel.query.get(complaint_id)
+        return db.session.get(ComplaintModel, complaint_id)
 
     @staticmethod
     def find_by_order_id(order_id):

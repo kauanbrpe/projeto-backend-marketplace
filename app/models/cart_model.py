@@ -16,12 +16,15 @@ class CartModel(db.Model):
     def to_dict(self):
         detailed_products = []
         for p in self.products:
-            qtd = db.session.query(cart_items.c.quantity).filter(cart_id=self.id, product_id=p.id).scalar()
+            qtd = db.session.query(cart_items.c.quantity).filter(
+                cart_items.c.cart_id == self.id,
+                cart_items.c.product_id == p.id
+            ).scalar()
 
             detailed_products.append({
                 "product_id": p.id,
                 "name": p.name,
-                "price": p.price,
+                "price": float(p.price),
                 "quantity": qtd if qtd else 1
             })
 

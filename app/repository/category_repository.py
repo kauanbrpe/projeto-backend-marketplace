@@ -10,7 +10,7 @@ class CategoryRepository:
 
     @staticmethod
     def find_by_id(category_id):
-        return CategoryModel.query.get(category_id)
+        return db.session.get(CategoryModel, category_id)
 
     @staticmethod
     def find_all():

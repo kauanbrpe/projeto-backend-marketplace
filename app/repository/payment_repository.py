@@ -10,7 +10,7 @@ class PaymentRepository:
 
     @staticmethod
     def find_by_id(payment_id):
-        return PaymentModel.query.get(payment_id)
+        return db.session.get(PaymentModel, payment_id)
 
     @staticmethod
     def find_by_order_id(order_id):

@@ -39,7 +39,7 @@ class CartService:
             new_quantity = current_quantity + quantity
             if product.stock < new_quantity:
                 raise ValueError(f"Error: Product stock is lower than quantity. Quantity: {product.stock}")
-            CartRepository.update_item_quantity(cart.id, product_id, quantity)
+            CartRepository.update_item_quantity(cart.id, product_id, new_quantity)
         else:
             CartRepository.add_item(cart.id, product_id, quantity)
 
@@ -51,6 +51,10 @@ class CartService:
             raise PermissionError("Access denied: You need to be logged in.")
 
         cart = CartRepository.find_by_user_id(current_user.id)
+
+        if CartRepository.get_item_quantity(cart.id, product_id) is None:
+            raise ValueError("Error: Product not in cart.")
+
         if not cart:
             raise ValueError("Error: Cart not found.")
 
@@ -70,7 +74,10 @@ class CartService:
         if not cart_obj or not cart_obj.products:
             raise ValueError("Error: Cart not found.")
 
-        valor_total_bruto = sum(float(produto.price) for produto in cart_obj.products)
+        valor_total_bruto = sum(
+            float(produto.price) * CartRepository.get_item_quantity(cart_obj.id, produto.id)
+            for produto in cart_obj.products
+        )
 
         valor_desconto = CouponService.validar_e_calcular_desconto(code_coupon, valor_total_bruto)
 

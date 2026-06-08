@@ -6,8 +6,8 @@ from flask_login import login_user, logout_user
 class UserService:
     @staticmethod
     def user_registration(data):
-        if not data.get("name") or not data.get("email") or not data.get("password"):
-            raise ValueError("Error: Name, email, and password required.")
+        if not data.get("name") or not data.get("email") or not data.get("password") or not data.get("endereco"):
+            raise ValueError("Error: Name, email, password and endereco required.")
 
         existing_user = UserRepository.find_by_email(data['email'])
         if existing_user:

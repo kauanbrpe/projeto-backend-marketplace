@@ -14,7 +14,7 @@ class CouponRepository:
 
     @staticmethod
     def find_by_id(coupon_id):
-        return CouponModel.query.get(coupon_id)
+        return db.session.get(CouponModel, coupon_id)
 
     @staticmethod
     def find_all():

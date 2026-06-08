@@ -9,6 +9,5 @@ from app.repository.payment_repository import PaymentRepository
 from app.repository.item_perdido_repository import ItemPerdidoRepository
 from app.repository.order_repository import OrderRepository
 from app.repository.complaint_repository import ComplaintRepository
-from app.repository.cart_repository import CartRepository
 from app.repository.review_repository import ReviewRepository
 from app.repository.perdido_repository import PerdidoRepository

@@ -3,6 +3,7 @@ from flask_restx import Namespace, Resource, fields
 from flask_login import login_required, current_user
 from app.service import PaymentService
 from app.models import OrderModel
+from app import db
 
 payment_ns = Namespace('payments', description='Operações relacionadas ao processamento de pagamentos')
 
@@ -38,7 +39,7 @@ class PaymentProcess(Resource):
         if not data or 'order_id' not in data or 'metodo_pagamento' not in data or 'valor' not in data:
             return {"error": "Dados de pagamento incompletos. Todos os campos são obrigatórios."}, 400
 
-        order = OrderModel.query.get(data['order_id'])
+        order = db.session.get(OrderModel, data['order_id'])
         if not order:
             return {"error": "Pedido não encontrado para faturamento."}, 404
 
@@ -76,7 +77,7 @@ class PaymentDetail(Resource):
         if not payment:
             return {"error": "Registro de pagamento não encontrado."}, 404
 
-        order = OrderModel.query.get(payment.order_id)
+        order = db.session.get(OrderModel, payment.order_id)
         if order and order.user_id != current_user.id and not current_user.is_admin:
             return {"error": "Acesso negado: Este registro pertence à transação de outro usuário."}, 403
 

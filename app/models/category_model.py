@@ -12,5 +12,5 @@ class CategoryModel(db.Model):
         return {
             "id": self.id,
             "name": self.name,
-            "products": self.products
+            "products": [p.to_dict() for p in self.products]
         }

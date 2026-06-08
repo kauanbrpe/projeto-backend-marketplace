@@ -9,8 +9,7 @@ class CouponService:
         if not current_user.is_authenticated or not current_user.is_admin:
             raise PermissionError("Permission denied.")
 
-        cupons = CouponRepository.find_all()
-        return [cupom.to_dict() for cupom in cupons]
+        CouponRepository.find_all()
 
     @staticmethod
     def criar_cupom(data, current_user):
@@ -61,7 +60,7 @@ class CouponService:
         if valor_total_pedido < cupom.min_order_value:
             return None
 
-        if cupom.discount_type == "percent":
+        if cupom.discount_type == "percentage":
             desconto = valor_total_pedido * (cupom.discount_value / 100)
         else:
             desconto = cupom.discount_value

@@ -10,7 +10,7 @@ class ReviewRepository:
 
     @staticmethod
     def find_by_id(review_id):
-        return ReviewModel.query.get(review_id)
+        return db.session.get(ReviewModel, review_id)
 
     @staticmethod
     def find_by_product_id(product_id):

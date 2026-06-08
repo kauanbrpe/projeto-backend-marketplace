@@ -10,7 +10,7 @@ class PerdidoRepository:
 
     @staticmethod
     def find_by_id(perdido_id):
-        return PerdidoModel.query.get(perdido_id)
+        return db.session.get(PerdidoModel, perdido_id)
 
     @staticmethod
     def find_by_user_id(user_id):

@@ -37,7 +37,7 @@ class OrderRepository:
 
     @staticmethod
     def buscar_por_id(order_id):
-        return OrderModel.query.get(order_id)
+        return db.session.get(OrderModel, order_id)
 
     @staticmethod
     def listar_por_usuario(user_id):

@@ -10,7 +10,7 @@ class UserRepository:
 
     @staticmethod
     def find_by_id(user_id):
-        return UserModel.query.get(user_id)
+        return db.session.get(UserModel, user_id)
 
     @staticmethod
     def find_by_email(email):
